@@ -3,32 +3,36 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from tqdm import tqdm
-from google.colab import files
-import io
 
-# Upload multiple input files
-uploaded = files.upload()
+# Read input file(s) locally instead of using files.upload()
+# Expected file: company_data.xlsx or .csv with "Company" and "Website" columns
 
-# Read and combine all valid input files
+input_files = ["career_portal.xlsx","career_pages"]  # You can list multiple files here if needed
+
 dataframes = []
-for filename in uploaded.keys():
-    if filename.endswith(".csv"):
-        df = pd.read_csv(io.BytesIO(uploaded[filename]))
-    elif filename.endswith(".xlsx"):
-        df = pd.read_excel(io.BytesIO(uploaded[filename]))
-    else:
-        print(f"❌ Unsupported file format: {filename}")
-        continue
+for file in input_files:
+    try:
+        if file.endswith(".csv"):
+            df = pd.read_csv(file)
+        elif file.endswith(".xlsx"):
+            df = pd.read_excel(file)
+        else:
+            print(f"❌ Unsupported file format: {file}")
+            continue
 
-    if "Company" not in df.columns or "Website" not in df.columns:
-        print(f"⚠️ Skipping {filename}: Missing 'Company' or 'Website' column.")
-        continue
+        if "Company" not in df.columns or "Website" not in df.columns:
+            print(f"⚠️ Skipping {file}: Missing 'Company' or 'Website' column.")
+            continue
 
-    df = df[["Company", "Website"]]
-    dataframes.append(df)
+        df = df[["Company", "Website"]]
+        dataframes.append(df)
+
+    except Exception as e:
+        print(f"❌ Failed to load {file}: {e}")
 
 if not dataframes:
-    raise ValueError("No valid files uploaded.")
+    raise ValueError("No valid files loaded.")
+
 df = pd.concat(dataframes, ignore_index=True)
 
 # Clean and fix URLs
@@ -57,14 +61,14 @@ def find_career_page(base_url):
         print(f"❌ Failed to get career page for {base_url}: {e}")
         return None
 
-# Job keyword matching
+# Keywords to detect relevant jobs
 KEYWORDS = ["data", "analyst", "analytics", "data science", "machine learning", "bi", "business intelligence"]
 
 def is_data_related(title):
     title = title.lower()
     return any(keyword in title for keyword in KEYWORDS)
 
-# Scrape job info
+# Scrape jobs from portal
 def scrape_jobs_from_portal(company, url):
     headers = {"User-Agent": "Mozilla/5.0"}
     jobs = []
@@ -107,7 +111,7 @@ def scrape_jobs_from_portal(company, url):
         print(f"❌ Error scraping {company}: {e}")
         return []
 
-# Loop through companies
+# Process each company
 all_jobs = []
 no_job_companies = []
 
@@ -128,9 +132,10 @@ for _, row in tqdm(df.iterrows(), total=len(df)):
     else:
         no_job_companies.append({"Company": company, "Website": base_url, "CareerPage": "Not Found"})
 
-# Save to Excel with two sheets
-with pd.ExcelWriter("matched_jobs.xlsx", engine="openpyxl") as writer:
+# Save result to Excel with 2 sheets
+output_file = "matched_jobs.xlsx"
+with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
     pd.DataFrame(all_jobs).to_excel(writer, index=False, sheet_name="MatchedJobs")
     pd.DataFrame(no_job_companies).to_excel(writer, index=False, sheet_name="NoJobsFound")
 
-files.download("matched_jobs.xlsx")
+print(f"✅ Job scraping complete. Results saved to {output_file}")
