@@ -55,7 +55,7 @@ def scrape_dynamic(url):
         print(f"[DYNAMIC] Error scraping {url}: {e}")
         return []
 
-# ---------- Main scraper ----------
+# ---------- Main ----------
 def main(batch_file):
     print(f"\n📦 Processing batch: {batch_file}")
     results = []
@@ -82,8 +82,10 @@ def main(batch_file):
                 "Scrape Time": datetime.now().isoformat()
             })
 
-    # Always write an output file, even if empty
-    output_file = f"results_{os.path.basename(batch_file).replace('.xlsx', '')}.csv"
+    # Final output filename (remove .xlsx)
+    batch_base = os.path.basename(batch_file).replace(".xlsx", "")
+    output_file = f"results_{batch_base}.csv"
+
     if results:
         pd.DataFrame(results).to_csv(output_file, index=False)
     else:
