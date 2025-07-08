@@ -83,7 +83,7 @@ def main(batch_file):
             })
 
     # Always write an output file, even if empty
-    output_file = f"results_{os.path.basename(batch_file).replace('.xlsx', '.csv')}"
+    output_file = f"results_{os.path.basename(batch_file).replace('.xlsx', '')}.csv"
     if results:
         pd.DataFrame(results).to_csv(output_file, index=False)
     else:
