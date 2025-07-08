@@ -1,0 +1,53 @@
+name: Scrape All Batches
+
+on:
+  workflow_dispatch:  # Run manually
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        batch: [
+          "career_sites_batch_01.xlsx",
+          "career_sites_batch_02.xlsx",
+          "career_sites_batch_03.xlsx",
+          "career_sites_batch_04.xlsx",
+          "career_sites_batch_05.xlsx",
+          "career_sites_batch_06.xlsx",
+          "career_sites_batch_07.xlsx",
+          "career_sites_batch_08.xlsx",
+          "career_sites_batch_09.xlsx",
+          "career_sites_batch_10.xlsx",
+          "career_sites_batch_11.xlsx",
+          "career_sites_batch_12.xlsx",
+          "career_sites_batch_13.xlsx",
+          "career_sites_batch_14.xlsx",
+          "career_sites_batch_15.xlsx",
+          "career_sites_batch_16.xlsx",
+          "career_sites_batch_17.xlsx",
+          "career_sites_batch_18.xlsx",
+          "career_sites_batch_19.xlsx"
+        ]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pandas requests beautifulsoup4 openpyxl playwright
+          playwright install --with-deps
+
+      - name: Run scraper on ${{ matrix.batch }}
+        run: python scrape.py batches/${{ matrix.batch }}
+
+      - name: Upload result CSV
+        uses: actions/upload-artifact@v2
+        with:
+          name: result-${{ matrix.batch }}
+          path: results_${{ matrix.batch }}.csv
