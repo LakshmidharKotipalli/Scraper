@@ -1,7 +1,7 @@
 name: Scrape All Batches
 
 on:
-  workflow_dispatch:  # Manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -39,4 +39,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: result-${{ matrix.batch }}
-          path: results_${{ matrix.batch }}.csv
+          path: results_${{ matrix.batch .replace('.xlsx', '') }}.csv
