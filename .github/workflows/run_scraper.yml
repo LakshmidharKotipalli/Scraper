@@ -1,7 +1,7 @@
 name: Scrape All Batches
 
 on:
-  workflow_dispatch:  # Run manually
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -9,32 +9,21 @@ jobs:
     strategy:
       matrix:
         batch: [
-          "career_sites_batch_01.xlsx",
-          "career_sites_batch_02.xlsx",
-          "career_sites_batch_03.xlsx",
-          "career_sites_batch_04.xlsx",
-          "career_sites_batch_05.xlsx",
-          "career_sites_batch_06.xlsx",
-          "career_sites_batch_07.xlsx",
-          "career_sites_batch_08.xlsx",
-          "career_sites_batch_09.xlsx",
-          "career_sites_batch_10.xlsx",
-          "career_sites_batch_11.xlsx",
-          "career_sites_batch_12.xlsx",
-          "career_sites_batch_13.xlsx",
-          "career_sites_batch_14.xlsx",
-          "career_sites_batch_15.xlsx",
-          "career_sites_batch_16.xlsx",
-          "career_sites_batch_17.xlsx",
-          "career_sites_batch_18.xlsx",
+          "career_sites_batch_01.xlsx", "career_sites_batch_02.xlsx", "career_sites_batch_03.xlsx",
+          "career_sites_batch_04.xlsx", "career_sites_batch_05.xlsx", "career_sites_batch_06.xlsx",
+          "career_sites_batch_07.xlsx", "career_sites_batch_08.xlsx", "career_sites_batch_09.xlsx",
+          "career_sites_batch_10.xlsx", "career_sites_batch_11.xlsx", "career_sites_batch_12.xlsx",
+          "career_sites_batch_13.xlsx", "career_sites_batch_14.xlsx", "career_sites_batch_15.xlsx",
+          "career_sites_batch_16.xlsx", "career_sites_batch_17.xlsx", "career_sites_batch_18.xlsx",
           "career_sites_batch_19.xlsx"
         ]
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
@@ -47,7 +36,7 @@ jobs:
         run: python scrape.py batches/${{ matrix.batch }}
 
       - name: Upload result CSV
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: result-${{ matrix.batch }}
           path: results_${{ matrix.batch }}.csv
