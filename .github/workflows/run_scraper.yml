@@ -35,8 +35,12 @@ jobs:
       - name: 🔍 Run scraper on ${{ matrix.batch }}
         run: python scrape.py batches/${{ matrix.batch }}
 
+      - name: 🧪 Extract batch base name
+        id: extract
+        run: echo "batch_base=$(basename '${{ matrix.batch }}' .xlsx)" >> $GITHUB_OUTPUT
+
       - name: 📤 Upload result CSV
         uses: actions/upload-artifact@v4
         with:
-          name: result-${{ matrix.batch }}
-          path: results_${{ matrix.batch .replace('.xlsx', '') }}.csv
+          name: result-${{ steps.extract.outputs.batch_base }}
+          path: results_${{ steps.extract.outputs.batch_base }}.csv
