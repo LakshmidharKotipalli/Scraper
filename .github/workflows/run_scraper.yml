@@ -1,7 +1,7 @@
 name: Scrape All Batches
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger from GitHub UI
 
 jobs:
   scrape:
@@ -19,23 +19,23 @@ jobs:
         ]
 
     steps:
-      - name: Checkout repo
+      - name: 📥 Checkout repo
         uses: actions/checkout@v2
 
-      - name: Set up Python
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: |
           pip install pandas requests beautifulsoup4 openpyxl playwright
           playwright install --with-deps
 
-      - name: Run scraper on ${{ matrix.batch }}
+      - name: 🔍 Run scraper on ${{ matrix.batch }}
         run: python scrape.py batches/${{ matrix.batch }}
 
-      - name: Upload result CSV
+      - name: 📤 Upload result CSV
         uses: actions/upload-artifact@v4
         with:
           name: result-${{ matrix.batch }}
